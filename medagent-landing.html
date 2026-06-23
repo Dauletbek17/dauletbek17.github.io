@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedAgent — AI ассистент для частных клиник</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0D1B2A;
+  --teal:#0EA5A0;
+  --teal-light:#E0F5F5;
+  --green:#25D366;
+  --green-dark:#128C7E;
+  --white:#FFFFFF;
+  --surface:#F7F9FC;
+  --border:#E5E7EB;
+  --text:#111827;
+  --muted:#6B7280;
+  --radius:12px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--text);background:var(--white);line-height:1.6}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 2rem}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-size:20px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--teal)}
+.nav-right{display:flex;align-items:center;gap:20px}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{font-size:14px;color:var(--muted);text-decoration:none;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--teal)}
+.lang-switch{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.lang-btn{padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s}
+.lang-btn.active{background:var(--teal);color:#fff}
+.nav-cta{background:var(--teal);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;text-decoration:none}
+.nav-cta:hover{background:#0c9490}
+.hero{background:var(--navy);padding:80px 2rem 100px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(14,165,160,.15),transparent 70%)}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(14,165,160,.15);border:1px solid rgba(14,165,160,.3);color:#5EEAD4;padding:6px 14px;border-radius:100px;font-size:13px;font-weight:500;margin-bottom:24px}
+.hero-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:#5EEAD4}
+.hero h1{font-size:46px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:20px}
+.hero h1 span{color:var(--teal)}
+.hero p{font-size:18px;color:#94A3B8;margin-bottom:36px;line-height:1.7}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap}
+.btn-primary{background:var(--teal);color:#fff;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.btn-primary:hover{background:#0c9490;transform:translateY(-1px)}
+.btn-ghost{border:1px solid rgba(255,255,255,.2);color:#fff;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.phone-wrap{display:flex;justify-content:center}
+.phone{background:#ECE5DD;border-radius:20px;overflow:hidden;width:320px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.phone-header{background:var(--green-dark);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.phone-avatar{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+.phone-info{flex:1}
+.phone-name{color:#fff;font-weight:600;font-size:14px}
+.phone-status{color:rgba(255,255,255,.7);font-size:12px}
+.chat-body{padding:12px;min-height:380px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.msg{max-width:85%;padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.5;position:relative;opacity:0;transform:translateY(10px);transition:all .3s}
+.msg.show{opacity:1;transform:translateY(0)}
+.msg-in{background:#fff;align-self:flex-start;border-radius:0 10px 10px 10px}
+.msg-out{background:#DCF8C6;align-self:flex-end;border-radius:10px 0 10px 10px}
+.msg-time{font-size:10px;color:#999;text-align:right;margin-top:2px}
+.typing{display:flex;gap:4px;padding:12px 16px;background:#fff;border-radius:0 10px 10px 10px;align-self:flex-start;opacity:0;transition:opacity .3s}
+.typing.show{opacity:1}
+.dot{width:7px;height:7px;border-radius:50%;background:#999;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.stats{background:var(--teal-light);padding:40px 2rem}
+.stats-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:32px;text-align:center}
+.stat-num{font-size:40px;font-weight:800;color:var(--teal)}
+.stat-label{font-size:14px;color:var(--muted);margin-top:4px}
+section{padding:80px 2rem}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-badge{display:inline-block;background:var(--teal-light);color:var(--teal);font-size:13px;font-weight:600;padding:4px 14px;border-radius:100px;margin-bottom:16px}
+.section-title{font-size:36px;font-weight:800;color:var(--navy);margin-bottom:12px;line-height:1.2}
+.section-sub{font-size:17px;color:var(--muted);max-width:560px}
+.problems{background:var(--surface)}
+.problems-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:48px}
+.prob-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden}
+.prob-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--teal)}
+.prob-icon{font-size:32px;margin-bottom:16px}
+.prob-card h3{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.prob-card p{font-size:14px;color:var(--muted);line-height:1.7}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:56px;position:relative}
+.step{text-align:center;position:relative;z-index:1}
+.step-num{width:88px;height:88px;border-radius:50%;background:var(--navy);color:#fff;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;border:3px solid var(--teal)}
+.step h3{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.step p{font-size:14px;color:var(--muted);line-height:1.7}
+.compare-bg{background:var(--navy)}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
+.comp-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:32px}
+.comp-card.highlight{background:rgba(14,165,160,.15);border-color:rgba(14,165,160,.4)}
+.comp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.comp-head h3{font-size:18px;font-weight:700;color:#fff}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.comp-row:last-child{border:none}
+.comp-label{font-size:14px;color:#94A3B8}
+.comp-val{font-size:14px;font-weight:600;color:#fff}
+.comp-val.old{color:#F87171}
+.comp-val.new{color:#34D399}
+.comp-total{margin-top:20px;text-align:center}
+.comp-total .amt{font-size:36px;font-weight:800;color:#fff}
+.comp-total .per{font-size:14px;color:#94A3B8}
+.saving{margin-top:32px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:12px;padding:20px;text-align:center}
+.saving p{color:#34D399;font-size:15px;font-weight:600}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.price-card{border:1px solid var(--border);border-radius:16px;padding:32px;position:relative}
+.price-card.featured{border:2px solid var(--teal);background:var(--teal-light)}
+.popular-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;font-size:12px;font-weight:700;padding:4px 16px;border-radius:100px;white-space:nowrap}
+.price-name{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px}
+.price-amt{font-size:36px;font-weight:800;color:var(--navy)}
+.price-per{font-size:14px;color:var(--muted)}
+.price-desc{font-size:14px;color:var(--muted);margin:16px 0 24px;line-height:1.7}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.price-features li{font-size:14px;color:var(--text);display:flex;gap:8px;align-items:flex-start}
+.price-features li::before{content:'✓';color:var(--teal);font-weight:700;flex-shrink:0}
+.price-btn{display:block;text-align:center;padding:12px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;transition:all .2s;border:2px solid var(--teal);color:var(--teal)}
+.price-btn:hover{background:var(--teal);color:#fff}
+.price-card.featured .price-btn{background:var(--teal);color:#fff}
+.price-card.featured .price-btn:hover{background:#0c9490}
+.cta-final{background:linear-gradient(135deg,var(--navy) 0%,#0D3B38 100%);padding:100px 2rem;text-align:center}
+.cta-final h2{font-size:40px;font-weight:800;color:#fff;margin-bottom:16px}
+.cta-final p{font-size:18px;color:#94A3B8;margin-bottom:40px}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-wa{background:var(--green);color:#fff;padding:16px 32px;border-radius:10px;font-size:16px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all .2s}
+.btn-wa:hover{background:#1da851;transform:translateY(-2px)}
+footer{background:var(--navy);padding:40px 2rem;text-align:center}
+footer p{color:#4B5563;font-size:14px}
+footer span{color:#6B7280}
+@media(max-width:768px){
+  .hero-inner{grid-template-columns:1fr;gap:40px}
+  .phone{width:280px}
+  .stats-inner{grid-template-columns:1fr}
+  .problems-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr;gap:40px}
+  .compare-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .hero h1{font-size:32px}
+  .section-title{font-size:28px}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo"><div class="logo-dot"></div>MedAgent</div>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#problems" data-i="nav_problems">Проблемы</a>
+        <a href="#how" data-i="nav_how">Как работает</a>
+        <a href="#pricing" data-i="nav_pricing">Цены</a>
+      </div>
+      <div class="lang-switch">
+        <button class="lang-btn active" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('kz')">KZ</button>
+      </div>
+      <a href="https://wa.me/77711376290?text=Хочу%20демо%20MedAgent" class="nav-cta" data-i="nav_cta">Получить демо</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge" data-i="hero_badge">AI ассистент для клиник</div>
+      <h1 data-i="hero_h1">Ваша клиника<br>работает — даже<br>когда все <span>спят</span></h1>
+      <p data-i="hero_p">AI ассистент в WhatsApp записывает пациентов, отвечает на вопросы и напоминает о визитах — круглосуточно, без ошибок и без выходных.</p>
+      <div class="hero-btns">
+        <a href="https://wa.me/77711376290?text=Хочу%20демо%20MedAgent" class="btn-primary" data-i="hero_btn1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Получить бесплатное демо
+        </a>
+        <a href="#how" class="btn-ghost" data-i="hero_btn2">Как это работает →</a>
+      </div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-header">
+          <div class="phone-avatar">🏥</div>
+          <div class="phone-info">
+            <div class="phone-name" data-i="chat_name">Клиника «Здоровье»</div>
+            <div class="phone-status" data-i="chat_status">онлайн</div>
+          </div>
+        </div>
+        <div class="chat-body" id="chatBody">
+          <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stats-inner">
+    <div><div class="stat-num">4+ ч</div><div class="stat-label" data-i="stat1">времени экономит врач каждый день</div></div>
+    <div><div class="stat-num">0</div><div class="stat-label" data-i="stat2">пропущенных сообщений — отвечает 24/7</div></div>
+    <div><div class="stat-num">30 сек</div><div class="stat-label" data-i="stat3">среднее время ответа пациенту</div></div>
+  </div>
+</div>
+
+<section class="problems" id="problems">
+  <div class="section-inner">
+    <div class="section-badge" data-i="prob_badge">Знакомые проблемы?</div>
+    <div class="section-title" data-i="prob_title">Клиники теряют деньги<br>каждый день</div>
+    <p class="section-sub" data-i="prob_sub">Каждая из этих проблем стоит вам пациентов и прибыли — молча, незаметно</p>
+    <div class="problems-grid">
+      <div class="prob-card"><div class="prob-icon">🌙</div><h3 data-i="p1_h">Пациент написал ночью — ушёл к конкурентам</h3><p data-i="p1_p">Человек нашёл вас в 23:00, написал в WhatsApp, не получил ответ и утром записался в другую клинику. Вы об этом даже не знаете.</p></div>
+      <div class="prob-card"><div class="prob-icon">📋</div><h3 data-i="p2_h">Администратор не успевает — ошибки в записях</h3><p data-i="p2_p">Один человек отвечает на звонки, встречает пациентов и ведёт расписание. Двойные записи, забытые звонки, стресс — каждый день.</p></div>
+      <div class="prob-card"><div class="prob-icon">❌</div><h3 data-i="p3_h">Пациенты не приходят на приём</h3><p data-i="p3_p">Никто не напомнил о визите. Врач сидит без пациента, клиника теряет деньги. 30% no-show можно было предотвратить простым сообщением.</p></div>
+      <div class="prob-card"><div class="prob-icon">💸</div><h3 data-i="p4_h">Один администратор — слишком дорого</h3><p data-i="p4_p">Зарплата, налоги, больничные, обучение. За 200 000 тг/мес вы получаете 8 рабочих часов. AI работает 24/7 за фиксированную стоимость.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="section-inner">
+    <div class="section-badge" data-i="how_badge">Как это работает</div>
+    <div class="section-title" data-i="how_title">Три шага — и клиника<br>автоматизирована</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h3 data-i="s1_h">Пациент пишет в WhatsApp</h3><p data-i="s1_p">В любое время суток. AI мгновенно отвечает, задаёт уточняющие вопросы и ведёт диалог как живой администратор.</p></div>
+      <div class="step"><div class="step-num">2</div><h3 data-i="s2_h">AI записывает и вносит в расписание</h3><p data-i="s2_p">Запись автоматически появляется в расписании врача. Никаких звонков, никаких ошибок, никаких двойных записей.</p></div>
+      <div class="step"><div class="step-num">3</div><h3 data-i="s3_h">Напоминание за 24 часа</h3><p data-i="s3_p">За день до визита пациент получает автоматическое напоминание в WhatsApp. Количество no-show снижается на 40%.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="compare-bg">
+  <div class="section-inner">
+    <div class="section-badge" style="background:rgba(14,165,160,.15);color:#5EEAD4" data-i="cmp_badge">Сравнение затрат</div>
+    <div class="section-title" style="color:#fff" data-i="cmp_title">MedAgent vs Администратор</div>
+    <p class="section-sub" style="color:#94A3B8" data-i="cmp_sub">Считаем честно — со всеми расходами</p>
+    <div class="compare-grid">
+      <div class="comp-card">
+        <div class="comp-head"><h3 data-i="cmp_old_title">❌ Администратор</h3></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r1">Оклад</span><span class="comp-val old">150 000 тг</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r2">Налоги и отчисления</span><span class="comp-val old">45 000 тг</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r3">Больничные / отпуск</span><span class="comp-val old">~20 000 тг</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r4">Рабочие часы</span><span class="comp-val" style="color:#fff">09:00–18:00</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r5">Ошибки и пропуски</span><span class="comp-val old" data-i="cmp_old_err">Бывают</span></div>
+        <div class="comp-total"><div class="amt">215 000 тг</div><div class="per" data-i="per_month">в месяц</div></div>
+      </div>
+      <div class="comp-card highlight">
+        <div class="comp-head"><h3>✅ MedAgent</h3></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r1b">Подписка</span><span class="comp-val new">59 900 тг</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r2">Налоги и отчисления</span><span class="comp-val new">0 тг</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r3">Больничные / отпуск</span><span class="comp-val new">0 тг</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r4">Рабочие часы</span><span class="comp-val new">24/7 / 365</span></div>
+        <div class="comp-row"><span class="comp-label" data-i="cmp_r5">Ошибки и пропуски</span><span class="comp-val new" data-i="cmp_new_err">Никогда</span></div>
+        <div class="comp-total"><div class="amt" style="color:#34D399">59 900 тг</div><div class="per" style="color:#94A3B8" data-i="per_month">в месяц</div></div>
+      </div>
+    </div>
+    <div class="saving"><p data-i="saving_text">💰 Ваша экономия: <strong>155 100 тг каждый месяц</strong> — это 1 860 000 тг в год</p></div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-badge" data-i="pr_badge">Тарифы</div>
+    <div class="section-title" data-i="pr_title">Простые и честные цены</div>
+    <p class="section-sub" data-i="pr_sub">Без скрытых платежей. Первые 14 дней — бесплатно.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name" data-i="t1_name">Старт</div>
+        <div><span class="price-amt">29 900</span> <span class="price-per" data-i="tg_mo">тг/мес</span></div>
+        <p class="price-desc" data-i="t1_desc">Для небольших клиник, которые хотят начать автоматизацию</p>
+        <ul class="price-features">
+          <li data-i="t1_f1">До 200 записей в месяц</li>
+          <li data-i="t1_f2">Ответы в WhatsApp 24/7</li>
+          <li data-i="t1_f3">Напоминания о визитах</li>
+          <li data-i="t1_f4">Интеграция с Google Календарь</li>
+          <li data-i="t1_f5">Поддержка по WhatsApp</li>
+        </ul>
+        <a href="https://wa.me/77711376290?text=Хочу%20тариф%20Старт" class="price-btn" data-i="t_choose">Выбрать тариф</a>
+      </div>
+      <div class="price-card featured">
+        <div class="popular-badge" data-i="popular">Популярный</div>
+        <div class="price-name" data-i="t2_name">Про</div>
+        <div><span class="price-amt">59 900</span> <span class="price-per" data-i="tg_mo">тг/мес</span></div>
+        <p class="price-desc" data-i="t2_desc">Для активных клиник с большим потоком пациентов</p>
+        <ul class="price-features">
+          <li data-i="t2_f1">Безлимитные записи</li>
+          <li data-i="t2_f2">Ответы в WhatsApp + Telegram</li>
+          <li data-i="t2_f3">Умные напоминания</li>
+          <li data-i="t2_f4">Аналитика и отчёты</li>
+          <li data-i="t2_f5">Интеграция с вашей CRM</li>
+          <li data-i="t2_f6">Приоритетная поддержка</li>
+        </ul>
+        <a href="https://wa.me/77711376290?text=Хочу%20тариф%20Про" class="price-btn" data-i="t_choose">Выбрать тариф</a>
+      </div>
+      <div class="price-card">
+        <div class="price-name" data-i="t3_name">Сеть клиник</div>
+        <div><span class="price-amt" data-i="t3_amt">По запросу</span></div>
+        <p class="price-desc" data-i="t3_desc">Для сети из нескольких филиалов с особыми требованиями</p>
+        <ul class="price-features">
+          <li data-i="t3_f1">Несколько филиалов</li>
+          <li data-i="t3_f2">Все каналы связи</li>
+          <li data-i="t3_f3">Кастомная логика диалогов</li>
+          <li data-i="t3_f4">Выделенный менеджер</li>
+          <li data-i="t3_f5">SLA-поддержка 24/7</li>
+          <li data-i="t3_f6">Индивидуальная интеграция</li>
+        </ul>
+        <a href="https://wa.me/77711376290?text=Хочу%20тариф%20для%20сети" class="price-btn" data-i="t3_btn">Обсудить условия</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <h2 data-i="cta_h">Готовы попробовать?</h2>
+  <p data-i="cta_p">Запустим демо для вашей клиники за 24 часа. Первые 14 дней — бесплатно.</p>
+  <div class="cta-btns">
+    <a href="https://wa.me/77711376290?text=Хочу%20демо%20MedAgent%20для%20клиники" class="btn-wa" data-i="cta_btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Написать в WhatsApp
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 MedAgent · Шымкент, Қазақстан · <span data-i="footer_text">Автоматизация для частных клиник</span></p>
+</footer>
+
+<script>
+const T = {
+  ru: {
+    nav_problems:'Проблемы', nav_how:'Как работает', nav_pricing:'Цены', nav_cta:'Получить демо',
+    hero_badge:'AI ассистент для клиник',
+    hero_h1:'Ваша клиника<br>работает — даже<br>когда все <span>спят</span>',
+    hero_p:'AI ассистент в WhatsApp записывает пациентов, отвечает на вопросы и напоминает о визитах — круглосуточно, без ошибок и без выходных.',
+    hero_btn1:'Получить бесплатное демо', hero_btn2:'Как это работает →',
+    chat_name:'Клиника «Здоровье»', chat_status:'онлайн',
+    stat1:'времени экономит врач каждый день', stat2:'пропущенных сообщений — отвечает 24/7', stat3:'среднее время ответа пациенту',
+    prob_badge:'Знакомые проблемы?', prob_title:'Клиники теряют деньги<br>каждый день', prob_sub:'Каждая из этих проблем стоит вам пациентов и прибыли — молча, незаметно',
+    p1_h:'Пациент написал ночью — ушёл к конкурентам', p1_p:'Человек нашёл вас в 23:00, написал в WhatsApp, не получил ответ и утром записался в другую клинику. Вы об этом даже не знаете.',
+    p2_h:'Администратор не успевает — ошибки в записях', p2_p:'Один человек отвечает на звонки, встречает пациентов и ведёт расписание. Двойные записи, забытые звонки, стресс — каждый день.',
+    p3_h:'Пациенты не приходят на приём', p3_p:'Никто не напомнил о визите. Врач сидит без пациента, клиника теряет деньги. 30% no-show можно было предотвратить простым сообщением.',
+    p4_h:'Один администратор — слишком дорого', p4_p:'Зарплата, налоги, больничные, обучение. За 200 000 тг/мес вы получаете 8 рабочих часов. AI работает 24/7 за фиксированную стоимость.',
+    how_badge:'Как это работает', how_title:'Три шага — и клиника<br>автоматизирована',
+    s1_h:'Пациент пишет в WhatsApp', s1_p:'В любое время суток. AI мгновенно отвечает, задаёт уточняющие вопросы и ведёт диалог как живой администратор.',
+    s2_h:'AI записывает и вносит в расписание', s2_p:'Запись автоматически появляется в расписании врача. Никаких звонков, никаких ошибок, никаких двойных записей.',
+    s3_h:'Напоминание за 24 часа', s3_p:'За день до визита пациент получает автоматическое напоминание в WhatsApp. Количество no-show снижается на 40%.',
+    cmp_badge:'Сравнение затрат', cmp_title:'MedAgent vs Администратор', cmp_sub:'Считаем честно — со всеми расходами',
+    cmp_old_title:'❌ Администратор', cmp_r1:'Оклад', cmp_r2:'Налоги и отчисления', cmp_r3:'Больничные / отпуск', cmp_r4:'Рабочие часы', cmp_r5:'Ошибки и пропуски', cmp_r1b:'Подписка',
+    cmp_old_err:'Бывают', cmp_new_err:'Никогда', per_month:'в месяц',
+    saving_text:'💰 Ваша экономия: <strong>155 100 тг каждый месяц</strong> — это 1 860 000 тг в год',
+    pr_badge:'Тарифы', pr_title:'Простые и честные цены', pr_sub:'Без скрытых платежей. Первые 14 дней — бесплатно.',
+    t1_name:'СТАРТ', t1_desc:'Для небольших клиник, которые хотят начать автоматизацию',
+    t1_f1:'До 200 записей в месяц', t1_f2:'Ответы в WhatsApp 24/7', t1_f3:'Напоминания о визитах', t1_f4:'Интеграция с Google Календарь', t1_f5:'Поддержка по WhatsApp',
+    t2_name:'ПРО', t2_desc:'Для активных клиник с большим потоком пациентов',
+    t2_f1:'Безлимитные записи', t2_f2:'Ответы в WhatsApp + Telegram', t2_f3:'Умные напоминания', t2_f4:'Аналитика и отчёты', t2_f5:'Интеграция с вашей CRM', t2_f6:'Приоритетная поддержка',
+    t3_name:'СЕТЬ КЛИНИК', t3_amt:'По запросу', t3_desc:'Для сети из нескольких филиалов с особыми требованиями',
+    t3_f1:'Несколько филиалов', t3_f2:'Все каналы связи', t3_f3:'Кастомная логика диалогов', t3_f4:'Выделенный менеджер', t3_f5:'SLA-поддержка 24/7', t3_f6:'Индивидуальная интеграция',
+    t_choose:'Выбрать тариф', t3_btn:'Обсудить условия', tg_mo:'тг/мес', popular:'Популярный',
+    cta_h:'Готовы попробовать?', cta_p:'Запустим демо для вашей клиники за 24 часа. Первые 14 дней — бесплатно.',
+    cta_btn:'Написать в WhatsApp', footer_text:'Автоматизация для частных клиник',
+    chat_msgs:[
+      {from:'in',text:'Сәлеметсіз бе! Стоматологқа жазылғым келеді 🦷',time:'23:12'},
+      {from:'out',text:'Сәлеметсіз бе! Қуаныштымыз 😊\n\nҚай маманға жазылғыңыз келеді?\n\n1️⃣ Терапевт\n2️⃣ Хирург\n3️⃣ Ортодонт',time:'23:12'},
+      {from:'in',text:'Терапевтке',time:'23:13'},
+      {from:'out',text:'Ертеңге бос уақыт:\n\n🕙 10:00\n🕑 14:00\n🕠 16:30\n\nҚайсысы ыңғайлы?',time:'23:13'},
+      {from:'in',text:'14:00 болады',time:'23:14'},
+      {from:'out',text:'✅ Жазылдыңыз!\n\n👨‍⚕️ Стоматолог-терапевт\n📅 Ертең сағат 14:00\n🏥 Абай к-сі 45\n\n24 сағат бұрын еске саламын 🔔',time:'23:14'}
+    ]
+  },
+  kz: {
+    nav_problems:'Мәселелер', nav_how:'Қалай жұмыс істейді', nav_pricing:'Бағалар', nav_cta:'Демо алу',
+    hero_badge:'Клиникаларға арналған AI көмекші',
+    hero_h1:'Клиникаңыз жұмыс<br>істейді — барлығы<br><span>ұйықтаса да</span>',
+    hero_p:'WhatsApp-тағы AI көмекші науқастарды жазады, сұрақтарға жауап береді және визиттерді еске салады — тәулік бойы, қатесіз.',
+    hero_btn1:'Тегін демо алу', hero_btn2:'Қалай жұмыс істейді →',
+    chat_name:'«Денсаулық» клиникасы', chat_status:'желіде',
+    stat1:'уақытты дәрігер күн сайын үнемдейді', stat2:'жіберіп алынған хабарлама — 24/7 жауап береді', stat3:'науқасқа орташа жауап беру уақыты',
+    prob_badge:'Таныс мәселелер бар ма?', prob_title:'Клиникалар күн сайын<br>ақша жоғалтады', prob_sub:'Осы мәселелердің әрқайсысы сізге науқастар мен пайданы жоғалтады — үнсіз, байқаусыз',
+    p1_h:'Науқас түнде жазды — бәсекелеске кетті', p1_p:'Адам 23:00-де сізді тапты, WhatsApp-қа жазды, жауап алмады және таңертең басқа клиникаға жазылды. Сіз мұны білмейсіз де.',
+    p2_h:'Әкімші үлгермейді — жазбаларда қателер', p2_p:'Бір адам қоңырауларға жауап береді, науқастарды қарсы алады және кестені жүргізеді. Қос жазбалар, ұмытылған қоңыраулар — күн сайын.',
+    p3_h:'Науқастар қабылдауға келмейді', p3_p:'Ешкім визит туралы еске салмады. Дәрігер науқассыз отыр, клиника ақша жоғалтады. No-show-дың 30%-ын қарапайым хабарламамен болдырмауға болады.',
+    p4_h:'Бір әкімші — тым қымбат', p4_p:'Жалақы, салықтар, науқас еттер, оқыту. 200 000 тг/ай үшін 8 жұмыс сағаты аласыз. AI 24/7 тұрақты баға бойынша жұмыс істейді.',
+    how_badge:'Қалай жұмыс істейді', how_title:'Үш қадам — және клиника<br>автоматтандырылды',
+    s1_h:'Науқас WhatsApp-қа жазады', s1_p:'Тәулігінің кез келген уақытында. AI лезде жауап береді, нақтылайтын сұрақтар қояды және тірі әкімші сияқты диалог жүргізеді.',
+    s2_h:'AI жазып, кестеге енгізеді', s2_p:'Жазба дәрігердің кестесінде автоматты түрде пайда болады. Ешқандай қоңырау жоқ, ешқандай қате жоқ, ешқандай қос жазба жоқ.',
+    s3_h:'24 сағат бұрын еске салу', s3_p:'Визиттің бір күні бұрын науқас WhatsApp-та автоматты еске салу алады. No-show саны 40%-ға азаяды.',
+    cmp_badge:'Шығындарды салыстыру', cmp_title:'MedAgent vs Әкімші', cmp_sub:'Барлық шығындарды ескере отырып, шынайы есептейміз',
+    cmp_old_title:'❌ Әкімші', cmp_r1:'Жалақы', cmp_r2:'Салықтар мен аударымдар', cmp_r3:'Науқас еті / демалыс', cmp_r4:'Жұмыс сағаттары', cmp_r5:'Қателер мен жіберіп алулар', cmp_r1b:'Жазылым',
+    cmp_old_err:'Болады', cmp_new_err:'Ешқашан', per_month:'айына',
+    saving_text:'💰 Сіздің үнемдеуіңіз: <strong>айына 155 100 тг</strong> — жылына 1 860 000 тг',
+    pr_badge:'Тарифтер', pr_title:'Қарапайым және адал бағалар', pr_sub:'Жасырын төлемдерсіз. Алғашқы 14 күн — тегін.',
+    t1_name:'БАСТАУЫШ', t1_desc:'Автоматтандыруды бастағысы келетін шағын клиникалар үшін',
+    t1_f1:'Айына 200 жазбаға дейін', t1_f2:'WhatsApp-та 24/7 жауап', t1_f3:'Визиттер туралы еске салу', t1_f4:'Google Күнтізбемен интеграция', t1_f5:'WhatsApp арқылы қолдау',
+    t2_name:'ПРО', t2_desc:'Науқастардың үлкен ағынына ие белсенді клиникалар үшін',
+    t2_f1:'Шексіз жазбалар', t2_f2:'WhatsApp + Telegram жауаптары', t2_f3:'Ақылды еске салулар', t2_f4:'Аналитика және есептер', t2_f5:'CRM жүйеңізбен интеграция', t2_f6:'Басымдықты қолдау',
+    t3_name:'КЛИНИКАЛАР ЖЕЛІСІ', t3_amt:'Сұрау бойынша', t3_desc:'Ерекше талаптары бар бірнеше филиалдан тұратын желі үшін',
+    t3_f1:'Бірнеше филиал', t3_f2:'Барлық байланыс арналары', t3_f3:'Диалогтардың арнайы логикасы', t3_f4:'Бөлінген менеджер', t3_f5:'24/7 SLA қолдауы', t3_f6:'Жеке интеграция',
+    t_choose:'Тариф таңдау', t3_btn:'Шарттарды талқылау', tg_mo:'тг/ай', popular:'Танымал',
+    cta_h:'Қолданып көруге дайынсыз ба?', cta_p:'Клиникаңыз үшін 24 сағат ішінде демо іске қосамыз. Алғашқы 14 күн — тегін.',
+    cta_btn:'WhatsApp-қа жазу', footer_text:'Жеке клиникаларды автоматтандыру',
+    chat_msgs:[
+      {from:'in',text:'Здравствуйте! Хочу записаться к стоматологу 🦷',time:'23:12'},
+      {from:'out',text:'Добрый день! Рады помочь 😊\n\nК какому специалисту?\n\n1️⃣ Терапевт\n2️⃣ Хирург\n3️⃣ Ортодонт',time:'23:12'},
+      {from:'in',text:'К терапевту',time:'23:13'},
+      {from:'out',text:'Свободное время на завтра:\n\n🕙 10:00\n🕑 14:00\n🕠 16:30\n\nКакое удобно?',time:'23:13'},
+      {from:'in',text:'14:00 пожалуйста',time:'23:14'},
+      {from:'out',text:'✅ Вы записаны!\n\n👨‍⚕️ Стоматолог-терапевт\n📅 Завтра в 14:00\n🏥 ул. Абая 45\n\nЗа 24 часа напомню 🔔',time:'23:14'}
+    ]
+  }
+};
+
+let currentLang = 'ru';
+let chatInterval = null;
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  const d = T[lang];
+  document.querySelectorAll('[data-i]').forEach(el => {
+    const key = el.getAttribute('data-i');
+    if (d[key] !== undefined) el.innerHTML = d[key];
+  });
+  restartChat();
+}
+
+const body = document.getElementById('chatBody');
+const typing = document.getElementById('typing');
+let idx = 0;
+
+function clearChat() {
+  Array.from(body.children).forEach(c => { if(c !== typing) c.remove(); });
+  typing.classList.remove('show');
+  idx = 0;
+}
+
+function addMsg(m) {
+  const d = document.createElement('div');
+  d.className = 'msg msg-' + m.from;
+  d.innerHTML = m.text.replace(/\n/g,'<br>') + '<div class="msg-time">' + m.time + '</div>';
+  body.insertBefore(d, typing);
+  setTimeout(() => d.classList.add('show'), 50);
+  body.scrollTop = body.scrollHeight;
+}
+
+function next() {
+  const msgs = T[currentLang].chat_msgs;
+  if (idx >= msgs.length) {
+    setTimeout(() => { clearChat(); setTimeout(next, 1000); }, 4000);
+    return;
+  }
+  const m = msgs[idx++];
+  if (m.from === 'out') {
+    typing.classList.add('show');
+    body.scrollTop = body.scrollHeight;
+    setTimeout(() => { typing.classList.remove('show'); addMsg(m); setTimeout(next, 900); }, 1400);
+  } else {
+    addMsg(m);
+    setTimeout(next, 700);
+  }
+}
+
+function restartChat() { clearChat(); setTimeout(next, 500); }
+
+setTimeout(next, 800);
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }});
+}, {threshold:0.1});
+document.querySelectorAll('.prob-card,.step,.price-card').forEach(el => {
+  el.style.opacity='0'; el.style.transform='translateY(20px)'; el.style.transition='opacity .5s ease,transform .5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
